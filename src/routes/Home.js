@@ -4,51 +4,39 @@ import Today from "../components/Today";
 import { Line } from "react-chartjs-2";
 import "./../App.css";
 
-
 class Home extends React.Component {
   state = {
     isLoading: true,
     reports: [],
-    reports_usa: [],
-    reports_krw: [],
     date: "",
+    datas_usa: [],
+    datas_krw: [],
+    dates: []
   };
 
   render_usd_graph = () => {
-    const { reports_usa} = this.state;
-    const datas = [];
-
-    let keys = Object.keys(reports_usa);
-    keys = Array.from(keys);
-    keys.sort();
-
-    for (var i = 0; i < keys.length; i++) {
-        let data = reports_usa[keys[i]].USD;
-        data = data.toFixed(4);
-        datas.push(data);
-      }
-
+    const { datas_usa, dates } = this.state;
     const data_graph = {
-      labels: keys,
+      labels: dates,
       datasets: [
         {
           label: "Exchange Rate",
           backgroundColor: "rgba(244, 152, 31, 0.5)",
           borderColor: "rgba(0,0,0,1)",
           borderWidth: 2,
-          data: datas
+          data: datas_usa
         }
       ]
     };
 
     return (
-        <div className="graph">
+      <div className='graph'>
         <Line
           data={data_graph}
           options={{
             title: {
               display: true,
-              text: "Exchange Rates Graph (CAD to USD) - from 2020.06.01",
+              text: "Exchange Rates Graph (CAD to USD) - from 2021.10.01",
               fontSize: 25
             },
             legend: {
@@ -56,48 +44,35 @@ class Home extends React.Component {
               position: "right"
             }
           }}
-          
         />
       </div>
-      
     );
   };
 
   render_krw_graph = () => {
-    const { reports_krw}  = this.state;
-    const datas = [];
-
-    let keys = Object.keys(reports_krw);
-    keys = Array.from(keys);
-    keys.sort();
-
-    for (var i = 0; i < keys.length; i++) {
-        let data = reports_krw[keys[i]].KRW;
-        data = data.toFixed(2);
-        datas.push(data);
-      }
+    const { datas_krw, dates } = this.state;
 
     const data_graph = {
-      labels: keys,
+      labels: dates,
       datasets: [
         {
           label: "Exchange Rate",
           backgroundColor: "rgba(75,192,192,0.5)",
           borderColor: "rgba(0,0,0,1)",
           borderWidth: 2,
-          data: datas
+          data: datas_krw
         }
       ]
     };
 
     return (
-        <div className="graph">
+      <div className='graph'>
         <Line
           data={data_graph}
           options={{
             title: {
               display: true,
-              text: "Exchange Rates Graph (CAD to KRW) - from 2020.06.01",
+              text: "Exchange Rates Graph (CAD to KRW) - from 2021.10.01",
               fontSize: 25
             },
             legend: {
@@ -105,49 +80,51 @@ class Home extends React.Component {
               position: "right"
             }
           }}
-          
         />
       </div>
-      
     );
   };
 
   getReports = async () => {
+    const api = await axios.get("https://api.exchangerate-api.com/v4/latest/CAD");
 
-    const api = await axios.get(
-        "https://api.exchangeratesapi.io/latest?base=CAD"
-      );
-    
     const today = api.data.date;
     this.state.date = today;
 
     const today_data = api.data.rates;
+
     this.state.reports = today_data;
 
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth()+1;
-    const day = date.getDate();
+    const date = today.slice(8, 11);
 
+    let date_count = 0;
+    if (date.charAt(0) === "0") {
+      date_count = parseInt(date.charAt(1));
+    } else {
+      date_count = parseInt(date);
+    }
 
-    const today_in_api = [year, month, day].join("-");
-    const api_usa = ["https://api.exchangeratesapi.io/history?start_at=2020-06-01&end_at=",today_in_api, "&base=CAD&symbols=USD"].join("");
+    const datas_usa = [];
+    const datas_krw = [];
+    const dates = [];
 
-    const today_usa = await axios.get(
-        api_usa
-      );
+    for (var i = 1; i < date_count + 1; i++) {
+      let daily_rate = await axios.get("https://v6.exchangerate-api.com/v6/baeaa176cab9d47e4f3fb8aa/history/CAD/2021/10/" + i);
+      let data_usa = daily_rate.data.conversion_rates.USD;
+      let data_krw = daily_rate.data.conversion_rates.KRW;
+      let date = "2021-10-" + i;
 
-    const usa_data = today_usa.data.rates;
-    this.state.reports_usa = usa_data;
+      data_usa = data_usa.toFixed(4);
+      data_krw = data_krw.toFixed(4);
 
-    const api_krw = ["https://api.exchangeratesapi.io/history?start_at=2020-06-01&end_at=",today_in_api, "&base=CAD&symbols=KRW"].join("");
+      dates.push(date);
+      datas_usa.push(data_usa);
+      datas_krw.push(data_krw);
+    }
 
-    const today_krw = await axios.get(
-        api_krw
-      );
-
-    const krw_data = today_krw.data.rates;
-    this.state.reports_krw = krw_data;
+    this.state.datas_usa = datas_usa;
+    this.state.datas_krw = datas_krw;
+    this.state.dates = dates;
 
     this.setState({
       isLoading: false
@@ -169,26 +146,21 @@ class Home extends React.Component {
           </div>
         ) : (
           <div>
-            <Today
-              today= {date}
-              krw={reports.KRW}
-              usd={reports.USD}
-            />
+            <Today today={date} krw={reports.KRW} usd={reports.USD} />
+            <div className='powerbi_data'>
+              <div>
+                <h2 className='powerbi'>Download Exchange Rate Data Record (from 2020.01.01 ~ 10.28) - Power BI</h2>
+              </div>
 
-            <div className="powerbi_data">
-                <div>
-                <h2 className="powerbi">Download Exchange Rate Data Record (from 2020.01.01 ~ 10.28) - Power BI</h2>
-                </div>
-
-
-            <a className="download" href="2020_exchange_rate_1028.pbix" download>Click to download!</a>
+              <a className='download' href='2020_exchange_rate_1028.pbix' download>
+                Click to download!
+              </a>
             </div>
-            <div className="graph_data">
-                <h2>Daily updated Exchange Rates Graph</h2>
+            <div className='graph_data'>
+              <h2>Daily updated Exchange Rates Graph</h2>
             </div>
             {this.render_usd_graph()} {this.render_krw_graph()}
-            
-            <div className='sign'> Copyright© Eunjoo Na 2020 </div>
+            <div className='sign'> Copyright© Eunjoo Na 2021 </div>
           </div>
         )}
       </section>
