@@ -36,7 +36,7 @@ class Home extends React.Component {
           options={{
             title: {
               display: true,
-              text: "Exchange Rates Graph (CAD to USD) - from 2021.10.01",
+              text: "Exchange Rates Graph (CAD to USD)",
               fontSize: 25
             },
             legend: {
@@ -57,7 +57,7 @@ class Home extends React.Component {
       datasets: [
         {
           label: "Exchange Rate",
-          backgroundColor: "rgba(75,192,192,0.5)",
+          backgroundColor: "lightcyan",
           borderColor: "rgba(0,0,0,1)",
           borderWidth: 2,
           data: datas_krw
@@ -72,7 +72,7 @@ class Home extends React.Component {
           options={{
             title: {
               display: true,
-              text: "Exchange Rates Graph (CAD to KRW) - from 2021.10.01",
+              text: "Exchange Rates Graph (CAD to KRW)",
               fontSize: 25
             },
             legend: {
@@ -95,40 +95,65 @@ class Home extends React.Component {
 
     this.state.reports = today_data;
 
-    const date = today.slice(8, 11);
+    let day = today.slice(8, 11);
 
-    let date_count = 0;
-    if (date.charAt(0) === "0") {
-      date_count = parseInt(date.charAt(1));
+    let month = today.slice(5, 7);
+
+    let month_count = 0;
+    if (month.charAt(0) === "0") {
+      month_count = parseInt(month.charAt(1));
     } else {
-      date_count = parseInt(date);
+      month_count = parseInt(month);
+    }
+
+    let day_count = 0;
+    if (day.charAt(0) === "0") {
+      day_count = parseInt(day.charAt(1));
+    } else {
+      day_count = parseInt(day);
     }
 
     const datas_usa = [];
     const datas_krw = [];
     const dates = [];
 
-    for (var i = 1; i < date_count + 1; i++) {
-      let daily_rate = await axios.get("https://v6.exchangerate-api.com/v6/baeaa176cab9d47e4f3fb8aa/history/CAD/2021/10/" + i);
-      let data_usa = daily_rate.data.conversion_rates.USD;
-      let data_krw = daily_rate.data.conversion_rates.KRW;
-      let date = "2021-10-" + i;
+    let test = await axios.get("https://freecurrencyapi.net/api/v2/historical?apikey=0cfcdd30-7999-11ec-96cb-b78b88907bed&base_currency=CAD&date_from=2022-01-01&date_to=" + today);
 
-      data_usa = data_usa.toFixed(4);
-      data_krw = data_krw.toFixed(4);
+    for (let k = 1; k < month_count + 1; k++) {
+      for (var i = 1; i < day_count + 1; i++) {
+        if (k < 10) {
+          month = "0" + k;
+        } else {
+          month = k;
+        }
 
-      dates.push(date);
-      datas_usa.push(data_usa);
-      datas_krw.push(data_krw);
+        if (i < 10) {
+          day = "0" + i;
+        } else {
+          day = i;
+        }
+
+        let date = "2022-" + month + "-" + day;
+        let dataTest = test.data.data[date];
+        let data_usa = dataTest["USD"];
+        let data_krw = dataTest["KRW"];
+
+        data_usa = data_usa.toFixed(4);
+        data_krw = data_krw.toFixed(4);
+
+        dates.push(date);
+        datas_usa.push(data_usa);
+        datas_krw.push(data_krw);
+      }
+
+      this.state.datas_usa = datas_usa;
+      this.state.datas_krw = datas_krw;
+      this.state.dates = dates;
+
+      this.setState({
+        isLoading: false
+      });
     }
-
-    this.state.datas_usa = datas_usa;
-    this.state.datas_krw = datas_krw;
-    this.state.dates = dates;
-
-    this.setState({
-      isLoading: false
-    });
   };
 
   componentDidMount() {
@@ -149,18 +174,19 @@ class Home extends React.Component {
             <Today today={date} krw={reports.KRW} usd={reports.USD} />
             <div className='powerbi_data'>
               <div>
-                <h2 className='powerbi'>Download Exchange Rate Data Record (from 2020.01.01 ~ 10.28) - Power BI</h2>
+                <h2 className='powerbi'>
+                  Click to download{" "}
+                  <a className='download' href='2020 Exchange Rate(2020.01.02-10.28).pbix' download>
+                    Exchange Rate Data Record (From 2020.01.02 to 2020.10.28) - Power BI (pbix, 58kb)
+                  </a>
+                </h2>
               </div>
-
-              <a className='download' href='2020_exchange_rate_1028.pbix' download>
-                Click to download!
-              </a>
             </div>
             <div className='graph_data'>
               <h2>Daily updated Exchange Rates Graph</h2>
             </div>
             {this.render_usd_graph()} {this.render_krw_graph()}
-            <div className='sign'> Copyright© Eunjoo Na 2021 </div>
+            <div className='sign'> Copyright© Eunjoo Na 2022 </div>
           </div>
         )}
       </section>
