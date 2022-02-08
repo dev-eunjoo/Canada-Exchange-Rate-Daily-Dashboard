@@ -3,7 +3,7 @@ nav {
   padding: 30px;
 }
 nav h1 {
-  font-size: 60px;
+  font-size: 50px;
 }
 
 nav > button {
@@ -16,4 +16,13 @@ nav > button > a {
   text-decoration: none;
   font-size: 20px;
   color: black;
+}
+
+@media only screen and (max-width: 1000px) {
+  nav h1 {
+    font-size: 24px;
+  }
+  nav > button > a {
+    font-size: 15px;
+  }
 }

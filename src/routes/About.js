@@ -6,7 +6,10 @@ function About() {
     <section className='container'>
       <div id='introduction'>
         <h2>About this application</h2>
-        <p>This web application provides the daily Exchange Rate information to the users.</p>
+        <p>
+          <br />
+          This web application provides the daily Exchange Rate information to the users.
+        </p>
         <p>Users can check the Today's Exchange Rate (CAD to KRW, CAD to USD) easily on the screen.</p>
         <p>Also, users can get the historical data via Power BI and check the visualized Exchange Rate flow chart updated each day.</p>
         <br />
@@ -20,7 +23,7 @@ function About() {
         </p>
         <p>
           Create by :
-          <a href='https://dev-eunjoo.github.io/' target='_blank' rel='noopener noreferrer'>
+          <a href='https://www.eunjoona.com/' target='_blank' rel='noopener noreferrer'>
             Eunjoo Na
           </a>
         </p>
