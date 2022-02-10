@@ -20,7 +20,7 @@
 
 **3. Display the line graph using react-chartjs-2 React component** <br />
 
-**4. Download Power BI document for the period 2020.01 - 2020.10** <br />
+**4. Provide downloading Power BI document for the period 2020.01 - 2020.10** <br />
  
 <hr/>
 
