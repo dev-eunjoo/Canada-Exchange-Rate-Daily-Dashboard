@@ -137,18 +137,20 @@ class Home extends React.Component {
 
         let date = "2022-" + month + "-" + day;
         let dataTest = test.data.data[date];
-        let data_usa = dataTest["USD"];
-        let data_krw = dataTest["KRW"];
 
-        data_usa = data_usa.toFixed(4);
-        data_krw = data_krw.toFixed(4);
+        if (dataTest) {
+          let data_usa = dataTest["USD"];
+          let data_krw = dataTest["KRW"];
 
-        const displayDate = month + "-" + day;
-        dates.push(displayDate);
-        console.log(dates.length);
+          data_usa = data_usa.toFixed(4);
+          data_krw = data_krw.toFixed(4);
 
-        datas_usa.push(data_usa);
-        datas_krw.push(data_krw);
+          const displayDate = month + "-" + day;
+          dates.push(displayDate);
+
+          datas_usa.push(data_usa);
+          datas_krw.push(data_krw);
+        }
       }
     }
     this.state.datas_usa = datas_usa;
