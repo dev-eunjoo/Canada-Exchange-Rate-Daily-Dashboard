@@ -106,7 +106,7 @@ class Home extends React.Component {
     const datas_krw = [];
     const dates = [];
 
-    let test = await axios.get("https://freecurrencyapi.net/api/v2/historical?apikey=0cfcdd30-7999-11ec-96cb-b78b88907bed&base_currency=CAD&date_from=2022-01-01&date_to=" + today);
+    let test = await axios.get("https://currencyapi.com/api/v2/historical?apikey=0cfcdd30-7999-11ec-96cb-b78b88907bed&base_currency=CAD&date_from=2022-01-01&date_to=" + today);
 
     let count = 31;
     for (let k = 1; k < month_count + 1; k++) {
